@@ -8,6 +8,7 @@ body,
   height: 100%;
   margin: 0;
   padding: 0;
+  text-align: center;
 }
 
 .App {
@@ -40,7 +41,7 @@ body,
     text-align: start;
 
     li {
-      cursor: pointer;
+      cursor: crosshair;
       padding: 6px 0;
       display: flex;
       justify-content: space-between;
@@ -54,8 +55,9 @@ body,
 }
 
 .color-box {
-  height: 16px;
-  width: 16px;
+  height: 20px;
+  width: 20px;
+  border-radius:15px;
   border: 1px lightgray solid;
   margin-right: 36px;
 }
@@ -92,6 +94,7 @@ form {
   button {
     border: none;
     background-color: black;
+    border-radius:5px;
     color: white;
     padding: 3px 8px;
     margin-top: 16px;
