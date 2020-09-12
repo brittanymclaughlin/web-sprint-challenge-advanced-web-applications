@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import { axiosWithAuth } from "../utils/axiosWithAuth";
 
 const initialColor = {
   color: "",
@@ -7,7 +7,6 @@ const initialColor = {
 };
 
 const ColorList = ({ colors, updateColors }) => {
-  console.log(colors);
   const [editing, setEditing] = useState(false);
   const [colorToEdit, setColorToEdit] = useState(initialColor);
 
@@ -18,18 +17,42 @@ const ColorList = ({ colors, updateColors }) => {
 
   const saveEdit = e => {
     e.preventDefault();
-    // Make a put request to save your updated color
-    // think about where will you get the id from...
-    // where is is saved right now?
+    axiosWithAuth()
+    .put(`/api/colors/${colorToEdit.id}`, colorToEdit)
+    .then(res => {
+      console.log("This is from saveEdit",  res);
+      updateColors([
+        ...colors.map(color => {
+          if (color.id === colorToEdit.id) {
+            return colorToEdit
+          } else {
+            return color
+          }
+        })
+      ])
+    })
   };
 
   const deleteColor = color => {
-    // make a delete request to delete this color
+    axiosWithAuth()
+     .delete(`/api/colors/${color.id}`)
+     .then((res) => {
+       console.log("Successful axios delete request", res);
+       updateColors(
+         colors.filter((hue) => {
+           return hue.id !== color.id;
+         })
+       )
+     })
+     .catch((err) => {
+       console.log("There's a problem with the delete function "+ err.message)
+     })
+
   };
 
   return (
     <div className="colors-wrap">
-      <p>colors</p>
+      <p>Colors</p>
       <ul>
         {colors.map(color => (
           <li key={color.color} onClick={() => editColor(color)}>
@@ -37,8 +60,7 @@ const ColorList = ({ colors, updateColors }) => {
               <span className="delete" onClick={e => {
                     e.stopPropagation();
                     deleteColor(color)
-                  }
-                }>
+                  }}>
                   x
               </span>{" "}
               {color.color}
@@ -52,16 +74,17 @@ const ColorList = ({ colors, updateColors }) => {
       </ul>
       {editing && (
         <form onSubmit={saveEdit}>
-          <legend>edit color</legend>
+          <legend>Edit Color</legend>
           <label>
             color name:
-            <input
+            <input 
               onChange={e =>
                 setColorToEdit({ ...colorToEdit, color: e.target.value })
               }
               value={colorToEdit.color}
             />
           </label>
+          
           <label>
             hex code:
             <input
@@ -73,10 +96,13 @@ const ColorList = ({ colors, updateColors }) => {
               }
               value={colorToEdit.code.hex}
             />
-          </label>
+          </label><div
+              className="color-box"
+              style={{ backgroundColor: colorToEdit.code.hex, marginLeft:"250px"}}
+            />
           <div className="button-row">
-            <button type="submit">save</button>
-            <button onClick={() => setEditing(false)}>cancel</button>
+            <button type="submit">Save</button>
+            <button onClick={() => setEditing(false)}>Cancel</button>
           </div>
         </form>
       )}
